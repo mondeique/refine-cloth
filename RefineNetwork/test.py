@@ -27,7 +27,8 @@ if __name__ == '__main__':
     # data_loader = CreateDataLoader(opt)
     # dataset = data_loader.load_data()
     test_set = refine_cloth_test_dataset.RefineClothTestDataset(opt)
-    dataset = DataLoader(test_set, batch_size=1, shuffle=True)
+    ## dataset shuffle False 로 바꿔 test result 를 더 잘 보기 위함
+    dataset = DataLoader(test_set, batch_size=1, shuffle=False)
     dataset_size = len(dataset)
     print('#test images = %d' % dataset_size)
     model = create_model(opt)
@@ -49,11 +50,22 @@ if __name__ == '__main__':
         # img_path = model.get_image_paths()
         # if i % 5 == 0:
         #     print('processing (%04d)-th image... %s' % (i, img_path))
-        test = model.fake_image.cpu().squeeze_(0)
-        print(test.shape)
-        img_path = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images', f'test_{i}_fakeimage.png')
-        tensor_to_pil = torchvision.transforms.ToPILImage()(test)
-        tensor_to_pil.save(img_path)
+        source_image = model.source_mask.cpu().squeeze_(0)
+        real_image = model.image_mask.cpu().squeeze_(0)
+        fake_image = model.fake_image.cpu().squeeze_(0)
+        print(fake_image.shape)
+        img_path_source = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                f'test_{i}_sourceimage.png')
+        img_path_real = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                f'test_{i}_realimage.png')
+        img_path_fake = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                f'test_{i}_fakeimage.png')
+        tensor_to_pil_source = torchvision.transforms.ToPILImage()(source_image)
+        tensor_to_pil_source.save(img_path_source)
+        tensor_to_pil_real = torchvision.transforms.ToPILImage()(real_image)
+        tensor_to_pil_real.save(img_path_real)
+        tensor_to_pil_fake = torchvision.transforms.ToPILImage()(fake_image)
+        tensor_to_pil_fake.save(img_path_fake)
 
     # save the website
     # webpage.save()

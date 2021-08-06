@@ -1,7 +1,7 @@
 
 # background remove source image
 cd image-background-remove-tool
-python main.py -i ../image_1.jpg -o ../RefineNetwork/data/dataset/test_clothes/base/test/test.png
+python main.py -i ../image_3.jpg -o ../RefineNetwork/data/dataset/test_clothes/base/test/test.png
 
 # get mask of source image
 cd ../

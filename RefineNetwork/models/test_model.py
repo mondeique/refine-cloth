@@ -44,12 +44,14 @@ class TestModel(RefineClothmodel):
         self.matched_mask = input['matched_image'].to(self.device)
 
     def forward(self):
-        a = torch.ones([1, 1, 256, 256]).to(self.device)
-        self.real_image_mask = torch.sub(a, self.real_image_mask).type(torch.uint8)
-        self.source_image_mask = torch.sub(a, self.source_image_mask).type(torch.uint8)
-        self.image_mask = self.real_image.mul(self.real_image_mask)
-        self.source_mask = self.source_image.mul(self.source_image_mask)
-        self.matched_mask = self.matched_mask.mul(self.source_image_mask)
+        a = torch.ones([1, 1, 512, 512]).to(self.device)
+        self.real_image_mask_sub = torch.sub(a, self.real_image_mask).type(torch.uint8)
+        self.source_image_mask_sub = torch.sub(a, self.source_image_mask).type(torch.uint8)
+        self.image_mask = self.real_image.mul(self.real_image_mask_sub)
+        self.source_mask = self.source_image.mul(self.source_image_mask_sub)
+        self.matched_mask = self.matched_mask.mul(self.source_image_mask_sub)
         self.fake_image = self.netG_A(torch.cat([self.matched_mask, self.source_mask], dim=1))
 
-        self.fake_image = self.fake_image.mul(self.source_image_mask)
+        self.fake_image = self.fake_image.mul(self.source_image_mask_sub)
+
+        self.fake_image = self.fake_image.add(self.source_image_mask)

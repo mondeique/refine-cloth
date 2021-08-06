@@ -9,6 +9,7 @@ RefineNetwork/data/__pycache__/
 RefineNetwork/data/checkpoints/
 RefineNetwork/checkpoints/
 RefineNetwork/results/
+RefineNetwork/last_exp/
 
 .idea
 .DS_Store

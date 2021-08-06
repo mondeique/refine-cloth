@@ -25,9 +25,9 @@ class RefineClothTestDataset(BaseDataset):
             # components = [root,clothes,hist,pXXX,cXXX_cXXX.jpg (source_real.jpg)]
             path_bundles.append({
                 'matched_image': base_path,
-                'real_image': os.path.join(self.root, 'test_clothes', 'base', components[-2], components[-1][-8:-4] + '.png'),
+                'real_image': os.path.join(self.root, 'test_clothes', 'base', components[-2], components[-1][-8:-4]),
                 'real_image_mask': os.path.join(self.root, 'test_clothes', 'mask', components[-2], components[-1][-8:-4] + '_mask.png'),
-                'source_image': os.path.join(self.root, 'test_clothes', 'base', components[-2], components[-1][0:4] + '.png'),
+                'source_image': os.path.join(self.root, 'test_clothes', 'base', components[-2], components[-1][0:4]),
                 'source_image_mask': os.path.join(self.dir_clothes, 'mask', components[-2], components[-1][0:4] + '_mask.png')
             })
 

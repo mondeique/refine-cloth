@@ -27,7 +27,7 @@ class RefineClothmodel(BaseModel):
         BaseModel.initialize(self, opt)
 
         # specify the training losses you want to print out. The program will call base_model.get_current_losses
-        self.loss_names = ['L1', 'content_vgg', 'perceptual']
+        self.loss_names = ['L1', 'content_vgg', 'perceptual', 'L1_matched']
         # specify the images G_A'you want to save/display. The program will call base_model.get_current_visuals
         visual_names_A = ['matched_mask', 'source_image', 'real_image', 'fake_image']
 
@@ -70,11 +70,12 @@ class RefineClothmodel(BaseModel):
 
     def get_perceptual_loss(self):
         image_features = self.VGG19(self.image_mask)
+        matched_features = self.VGG19(self.matched_mask)
         fake_features = self.VGG19(self.fake_image)
-        return self.criterionPerceptual(image_features, fake_features)
+        return 0.5 * self.criterionContent(matched_features, fake_features) + self.criterionPerceptual(image_features, fake_features)
 
     def forward(self):
-        a = torch.ones([4,1,256,256]).to(self.device)
+        a = torch.ones([2,1,512,512]).to(self.device)
         self.real_image_mask = torch.sub(a, self.real_image_mask).type(torch.uint8)
         self.source_image_mask = torch.sub(a, self.source_image_mask).type(torch.uint8)
         self.image_mask = self.real_image.mul(self.real_image_mask)
@@ -94,9 +95,10 @@ class RefineClothmodel(BaseModel):
 
         # get L1 loss
         self.loss_L1 = 2 * self.criterionL1(self.image_mask, self.fake_image)
+        self.loss_L1_matched = self.criterionL1(self.matched_mask, self.fake_image)
 
         # combined loss
-        self.loss_G = self.loss_content_vgg + self.loss_perceptual + self.loss_L1
+        self.loss_G = self.loss_content_vgg + self.loss_perceptual + self.loss_L1 + self.loss_L1_matched
         self.loss_G.backward()
 
     def optimize_parameters(self):
