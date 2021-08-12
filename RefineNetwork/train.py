@@ -4,7 +4,7 @@ from distributed.protocol import torch
 
 from options.train_options import TrainOptions
 from data import CreateDataLoader
-from data import refine_cloth_dataset
+from data import andre_ai_dataset
 from models import create_model
 from util.visualizer import Visualizer
 from torch.utils.data import DataLoader
@@ -13,7 +13,7 @@ if __name__ == '__main__':
     opt = TrainOptions().parse()
     # data_loader = CreateDataLoader(opt)
     # dataset = data_loader.load_data()
-    training_set = refine_cloth_dataset.RefineClothDataset(opt)
+    training_set = andre_ai_dataset.AndreAIDataset(opt)
     dataset = DataLoader(training_set, opt.batch_size, shuffle=True)
     dataset_size = len(dataset)
     print('#training images = %d' % dataset_size)

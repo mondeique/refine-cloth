@@ -1,15 +1,15 @@
 
 # background remove source image
-cd image-background-remove-tool
-python main.py -i ../image_3.jpg -o ../RefineNetwork/data/dataset/test_clothes/base/test/test.png
+# cd image-background-remove-tool
+# python main.py -i ../image_3.jpg -o ../RefineNetwork/data/dataset/test_clothes/base/test/test.png
 
 # get mask of source image
 cd ../
 python get_mask.py -s './RefineNetwork/data/dataset/test_clothes/base/test/test.png' -r './RefineNetwork/data/dataset/test_clothes/mask/test/test_mask.png'
 
-# background remove reference image
-cd image-background-remove-tool
-python main.py -i ../image_2.jpg -o ../RefineNetwork/data/dataset/test_clothes/base/test/refe.png
+## background remove reference image
+# cd image-background-remove-tool
+# python main.py -i ../image_2.jpg -o ../RefineNetwork/data/dataset/test_clothes/base/test/refe.png
 
 # get mask of reference image
 cd ../

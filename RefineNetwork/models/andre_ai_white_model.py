@@ -12,9 +12,9 @@ import numpy as np
 from util.wasserstein_loss import calc_gradient_penalty
 
 
-class RefineClothmodel(BaseModel):
+class AndreAImodel(BaseModel):
     def name(self):
-        return 'RefineClothmodel'
+        return 'AndreAImodel'
 
     @staticmethod
     def modify_commandline_options(parser, is_train=True):
@@ -27,20 +27,21 @@ class RefineClothmodel(BaseModel):
         BaseModel.initialize(self, opt)
 
         # specify the training losses you want to print out. The program will call base_model.get_current_losses
-        self.loss_names = ['L1', 'content_vgg', 'perceptual', 'L1_matched']
+        self.loss_names = ['White_content_vgg', 'White_L1', 'White_perceptual']
         # specify the images G_A'you want to save/display. The program will call base_model.get_current_visuals
-        visual_names_A = ['matched_mask', 'source_image', 'real_image', 'fake_image']
+        visual_names_A = ['source_image', 'source_image_mask', 'white_source_image']
 
         self.visual_names = visual_names_A
         # specify the models you want to save to the disk. The program will call base_model.save_networks and base_model.load_networks
         if self.isTrain:
-            self.model_names = ['G_A']
+            self.model_names = ['White_A']
         else:  # during test time, only load Gs
-            self.model_names = ['G_A']
+            self.model_names = ['White_A']
 
         # load/define networks
-        self.netG_A = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
-                                         not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
+        # TODO : white generator pre-trained network load
+        self.netWhite_A = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
+                                        not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
         self.VGG19 = networks.VGG19(requires_grad=False).cuda()
         use_sigmoid = opt.no_lsgan
 
@@ -50,40 +51,30 @@ class RefineClothmodel(BaseModel):
             self.criterionL1 = torch.nn.L1Loss()
             self.criterionPerceptual = networks.PerceptualLoss().to(self.device)
             # initialize optimizers
-            self.optimizer_G = torch.optim.Adam(self.netG_A.parameters(),
+            self.optimizer_G = torch.optim.Adam(self.netWhite_A.parameters(),
                                                 lr=opt.lr, betas=(opt.beta1, 0.999))
 
             self.optimizers = []
             self.optimizers.append(self.optimizer_G)
 
     def set_input(self, input):
-        self.real_image = input['real_image'].to(self.device)
-        self.real_image_mask = input['real_image_mask'].to(self.device)
         self.source_image = input['source_image'].to(self.device)
         self.source_image_mask = input['source_image_mask'].to(self.device)
-        self.matched_mask = input['matched_image'].to(self.device)
 
     def get_vgg_loss(self):
-        source_features = self.VGG19(self.source_mask)
-        fake_features = self.VGG19(self.fake_image)
+        source_features = self.VGG19(self.source_image)
+        fake_features = self.VGG19(self.white_source_image)
         return self.criterionContent(source_features, fake_features)
 
     def get_perceptual_loss(self):
-        image_features = self.VGG19(self.image_mask)
-        matched_features = self.VGG19(self.matched_mask)
-        fake_features = self.VGG19(self.fake_image)
-        return 0.5 * self.criterionPerceptual(matched_features, fake_features) + self.criterionPerceptual(image_features, fake_features)
+        input_features = self.VGG19(self.source_image_mask)
+        fake_features = self.VGG19(self.white_source_image)
+        return + self.criterionPerceptual(input_features, fake_features)
 
     def forward(self):
-        a = torch.ones([2,1,512,512]).to(self.device)
-        self.real_image_mask = torch.sub(a, self.real_image_mask).type(torch.uint8)
-        self.source_image_mask = torch.sub(a, self.source_image_mask).type(torch.uint8)
-        self.image_mask = self.real_image.mul(self.real_image_mask)
-        self.source_mask = self.source_image.mul(self.source_image_mask)
-        self.matched_mask = self.matched_mask.mul(self.source_image_mask)
-        self.fake_image = self.netG_A(torch.cat([self.matched_mask, self.source_mask], dim=1))
+        self.white_source_image = self.netWhite_A(torch.cat([self.source_image, self.source_image_mask], dim=1))
 
-        self.fake_image = self.fake_image.mul(self.source_image_mask)
+        self.white_source_image = self.white_source_image.mul(self.source_image_mask)
 
     def backward_G(self):
 
@@ -94,11 +85,10 @@ class RefineClothmodel(BaseModel):
         self.loss_perceptual = self.get_perceptual_loss()
 
         # get L1 loss
-        self.loss_L1 = 2 * self.criterionL1(self.image_mask, self.fake_image)
-        self.loss_L1_matched = self.criterionL1(self.matched_mask, self.fake_image)
+        self.loss_L1 = self.criterionL1(self.source_image_mask, self.white_source_image)
 
         # combined loss
-        self.loss_G = self.loss_content_vgg + self.loss_perceptual + self.loss_L1 + self.loss_L1_matched
+        self.loss_G = self.loss_content_vgg + self.loss_perceptual + self.loss_L1
         self.loss_G.backward()
 
     def optimize_parameters(self):
