@@ -12,7 +12,7 @@ import numpy as np
 from util.wasserstein_loss import calc_gradient_penalty
 
 
-class AndreAImodel(BaseModel):
+class AndreAIModel(BaseModel):
     def name(self):
         return 'AndreAImodel'
 
@@ -39,8 +39,25 @@ class AndreAImodel(BaseModel):
             self.model_names = ['G_A']
 
         # load/define networks
-        # TODO : white generator pre-trained network load
-        self.netWhite_A = networks.define_UnetMask(opt.input_nc)
+        self.netWhite = networks.define_G(opt.input_nc_warp, opt.output_nc, opt.ngf, opt.netG, opt.norm,
+                                         not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
+        load_filename = '%s_net_%s.pth' % ('latest', 'White')
+        load_path = os.path.join(self.save_dir, load_filename)
+        net = getattr(self, 'net' + 'White')
+        if isinstance(net, torch.nn.DataParallel):
+            net = net.module
+        print('loading the model from %s' % load_path)
+        # if you are using PyTorch newer than 0.4 (e.g., built from
+        # GitHub source), you can remove str() on self.device
+        state_dict = torch.load(load_path, map_location=str(self.device))
+        if hasattr(state_dict, '_metadata'):
+            del state_dict._metadata
+        print(state_dict.keys())
+        # patch InstanceNorm checkpoints prior to 0.4
+        for key in list(state_dict.keys()):  # need to copy keys here because we mutate in loop
+            self.__patch_instance_norm_state_dict(state_dict, net, key.split('.'))
+        self.netWhite.load_state_dict(state_dict)
+
         self.netG_A = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
                                          not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
         self.VGG19 = networks.VGG19(requires_grad=False).cuda()

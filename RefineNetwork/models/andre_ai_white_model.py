@@ -12,9 +12,9 @@ import numpy as np
 from util.wasserstein_loss import calc_gradient_penalty
 
 
-class AndreAImodel(BaseModel):
+class AndreAIWhiteModel(BaseModel):
     def name(self):
-        return 'AndreAImodel'
+        return 'AndreAIWhiteModel'
 
     @staticmethod
     def modify_commandline_options(parser, is_train=True):
@@ -34,13 +34,12 @@ class AndreAImodel(BaseModel):
         self.visual_names = visual_names_A
         # specify the models you want to save to the disk. The program will call base_model.save_networks and base_model.load_networks
         if self.isTrain:
-            self.model_names = ['White_A']
+            self.model_names = ['White']
         else:  # during test time, only load Gs
-            self.model_names = ['White_A']
+            self.model_names = ['White']
 
         # load/define networks
-        # TODO : white generator pre-trained network load
-        self.netWhite_A = networks.define_G(opt.input_nc, opt.output_nc, opt.ngf, opt.netG, opt.norm,
+        self.netWhite = networks.define_G(opt.input_nc_warp, opt.output_nc, opt.ngf, opt.netG, opt.norm,
                                         not opt.no_dropout, opt.init_type, opt.init_gain, self.gpu_ids)
         self.VGG19 = networks.VGG19(requires_grad=False).cuda()
         use_sigmoid = opt.no_lsgan
@@ -51,7 +50,7 @@ class AndreAImodel(BaseModel):
             self.criterionL1 = torch.nn.L1Loss()
             self.criterionPerceptual = networks.PerceptualLoss().to(self.device)
             # initialize optimizers
-            self.optimizer_G = torch.optim.Adam(self.netWhite_A.parameters(),
+            self.optimizer_G = torch.optim.Adam(self.netWhite.parameters(),
                                                 lr=opt.lr, betas=(opt.beta1, 0.999))
 
             self.optimizers = []
@@ -72,8 +71,7 @@ class AndreAImodel(BaseModel):
         return + self.criterionPerceptual(input_features, fake_features)
 
     def forward(self):
-        self.white_source_image = self.netWhite_A(torch.cat([self.source_image, self.source_image_mask], dim=1))
-
+        self.white_source_image = self.netWhite(torch.cat([self.source_image, self.source_image_mask], dim=1))
         self.white_source_image = self.white_source_image.mul(self.source_image_mask)
 
     def backward_G(self):
@@ -88,7 +86,7 @@ class AndreAImodel(BaseModel):
         self.loss_L1 = self.criterionL1(self.source_image_mask, self.white_source_image)
 
         # combined loss
-        self.loss_G = self.loss_content_vgg + self.loss_perceptual + self.loss_L1
+        self.loss_G = 2 * self.loss_content_vgg + self.loss_perceptual + self.loss_L1
         self.loss_G.backward()
 
     def optimize_parameters(self):
