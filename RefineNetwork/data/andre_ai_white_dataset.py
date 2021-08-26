@@ -19,12 +19,11 @@ class AndreAIWhiteDataset(BaseDataset):
     def make_data_bundles(self, base_image_path):
         path_bundles = []
         for base_path in base_image_path:
-            # product_path = os.path.join(base_image_path, base_path)
             components = base_path.split('/')
-            # components = [root,clothes,hist,pXXX,cXXX_cXXX.jpg (source_real.jpg)]
+            # components = [root,clothes,base,pXXX,cxxx,x.jpg]
             path_bundles.append({
-                'source_image': os.path.join(self.dir_images, 'base', components[-2], components[-1][0:4]),
-                'source_image_mask': os.path.join(self.dir_images, 'mask', components[-2], components[-1][0:4] + '_mask.png')
+                'source_image': base_path,
+                'source_image_mask': os.path.join(self.dir_images, 'mask', components[-3], components[-2], components[-1][:-4] + '_mask.png')
             })
 
         return path_bundles
@@ -34,8 +33,9 @@ class AndreAIWhiteDataset(BaseDataset):
         self.batch_size = opt.batch_size
         self.root = opt.dataroot
         self.dir_images = os.path.join(self.root, 'images')
-        self.dir_clothes_hist = os.path.join(self.root, 'clothes/hist/')
-        self.base_images_path = sorted(make_dataset(self.dir_clothes_hist))
+        self.dir_clothes = os.path.join(self.root, 'clothes')
+        self.dir_base_images = os.path.join(self.root, 'images/base')
+        self.base_images_path = sorted(make_dataset(self.dir_base_images))
 
         self.train_data_bundle_paths = self.make_data_bundles(self.base_images_path)
 

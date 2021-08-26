@@ -27,9 +27,10 @@ def make_dataset(dir):
 
     for product in sorted(os.listdir(dir)):
         for color in sorted(os.listdir(os.path.join(dir, product))):
-            path = os.path.join(dir, product, color)
-            if is_image_file(path):
-                base_images.append(path)
+            for file in sorted(os.listdir(os.path.join(dir, product, color))):
+                path = os.path.join(dir, product, color, file)
+                if is_image_file(path):
+                    base_images.append(path)
 
     return base_images
 

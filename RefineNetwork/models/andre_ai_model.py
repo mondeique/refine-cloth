@@ -27,9 +27,9 @@ class AndreAIModel(BaseModel):
         BaseModel.initialize(self, opt)
 
         # specify the training losses you want to print out. The program will call base_model.get_current_losses
-        self.loss_names = ['G_content_vgg', 'G_hist_L1', 'G_hist_perceptual', 'G_real_L1', 'G_real_perceptual']
+        self.loss_names = ['content_vgg', 'perceptual', 'perceptual_matched', 'L1', 'L1_matched']
         # specify the images G_A'you want to save/display. The program will call base_model.get_current_visuals
-        visual_names_A = ['source_image', 'white_source_image', 'matched_image', 'real_image', 'fake_image']
+        visual_names_A = ['source_image', 'white_source_image', 'matched_image', 'input_cloth_image', 'fake_image']
 
         self.visual_names = visual_names_A
         # specify the models you want to save to the disk. The program will call base_model.save_networks and base_model.load_networks
@@ -94,14 +94,13 @@ class AndreAIModel(BaseModel):
         input_features = self.VGG19(self.input_cloth_image)
         matched_features = self.VGG19(self.matched_mask)
         fake_features = self.VGG19(self.fake_image)
-        return 0.5 * self.criterionPerceptual(matched_features, fake_features) + self.criterionPerceptual(input_features, fake_features)
+        return self.criterionPerceptual(matched_features, fake_features), self.criterionPerceptual(input_features, fake_features)
 
     def forward(self):
         self.input_cloth_image = self.input_cloth_image.mul(self.input_cloth_image_mask)
         self.source_cloth_image = self.source_cloth_image.mul(self.source_cloth_image_mask)
         self.matched_mask = self.matched_mask.mul(self.source_cloth_image_mask)
-        # TODO : netWhite_A
-        self.white_source_image = self.netWhite_A(torch.cat([self.source_image, self.source_image_mask], dim=1))
+        self.white_source_image = self.netWhite(torch.cat([self.source_image, self.source_image_mask], dim=1))
         self.fake_image = self.netG_A(torch.cat([self.matched_mask, self.white_source_image], dim=1))
 
         self.fake_image = self.fake_image.mul(self.source_image_mask)
@@ -112,14 +111,15 @@ class AndreAIModel(BaseModel):
         self.loss_content_vgg = self.get_vgg_loss()
 
         # get perceptual loss
-        self.loss_perceptual = self.get_perceptual_loss()
+        self.loss_perceptual_matched, self.loss_perceptual = self.get_perceptual_loss()
 
         # get L1 loss
-        self.loss_L1 = self.criterionL1(self.input_cloth_image, self.fake_image)
         self.loss_L1_matched = self.criterionL1(self.matched_mask, self.fake_image)
+        self.loss_L1 = self.criterionL1(self.input_cloth_image, self.fake_image)
 
         # combined loss
-        self.loss_G = self.loss_content_vgg + self.loss_perceptual + self.loss_L1 + self.loss_L1_matched
+        self.loss_G = self.loss_content_vgg + self.loss_perceptual + 0.5 * self.loss_perceptual_matched + \
+                      self.loss_L1 + self.loss_L1_matched
         self.loss_G.backward()
 
     def optimize_parameters(self):

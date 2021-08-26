@@ -19,17 +19,15 @@ ref = cv2.imread(args["reference"])
 product_path = args["source"].split('/')[-2]
 color_path = args["source"].split('/')[-1]
 color_path = color_path.split('_')[-2]
-base_color_path = args["reference"].split('/')[-1]
+base_color_path = args["reference"].split('/')[-1].split('.')[0]
 
 # determine if we are performing multichannel histogram matching
 # and then perform histogram matching itself
 print("[INFO] performing histogram matching...")
 multi = True if src.shape[-1] > 1 else False
 matched = exposure.match_histograms(src, ref, multichannel=multi)
-
 # base_path = '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/hist/'
-final_path = args["output_path"]
-print(final_path)
+final_path = args["output_path"] + color_path + '_' + base_color_path + '.jpg'
 # show the output images
 # cv2.imwrite('./result/src.jpg', src)
 # cv2.imwrite('./result/ref.jpg', ref)
