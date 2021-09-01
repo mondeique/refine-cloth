@@ -87,7 +87,7 @@ class AndreAIWhiteModel(BaseModel):
         self.loss_L1 = self.criterionL1(self.source_image_mask_multi, self.white_source_image)
 
         # combined loss
-        self.loss_G = 2 * self.loss_content_vgg + self.loss_perceptual + self.loss_L1
+        self.loss_G = 2 * self.loss_content_vgg + self.loss_perceptual + 10 * self.loss_L1
         self.loss_G.backward()
 
     def optimize_parameters(self):
