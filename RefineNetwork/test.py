@@ -8,7 +8,7 @@ from models import create_model
 from util import util
 from util.visualizer import save_images
 from util import html
-from data import refine_cloth_test_dataset
+from data import refine_cloth_test_dataset, andre_ai_test_dataset
 from torch.utils.data import DataLoader
 import torchvision
 import torch
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     opt.display_id = -1   # no visdom display
     # data_loader = CreateDataLoader(opt)
     # dataset = data_loader.load_data()
-    test_set = refine_cloth_test_dataset.RefineClothTestDataset(opt)
+    test_set = andre_ai_test_dataset.AndreAITestDataset(opt)
     ## dataset shuffle False 로 바꿔 test result 를 더 잘 보기 위함
     dataset = DataLoader(test_set, batch_size=1, shuffle=False)
     dataset_size = len(dataset)
@@ -50,22 +50,30 @@ if __name__ == '__main__':
         # img_path = model.get_image_paths()
         # if i % 5 == 0:
         #     print('processing (%04d)-th image... %s' % (i, img_path))
-        source_image = model.source_mask.cpu().squeeze_(0)
-        real_image = model.image_mask.cpu().squeeze_(0)
+        source_image = model.source_image.cpu().squeeze_(0)
+        source_cloth_image = model.source_cloth_image.cpu().squeeze_(0)
+        input_cloth_image = model.input_cloth_image.cpu().squeeze_(0)
         fake_image = model.fake_image.cpu().squeeze_(0)
+        final_image = model.final_image.cpu().squeeze_(0)
         print(fake_image.shape)
         img_path_source = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
                                 f'test_{i}_sourceimage.png')
-        img_path_real = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
-                                f'test_{i}_realimage.png')
+        img_path_source_cloth = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                f'test_{i}_sourceclothimage.png')
+        img_path_input = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                f'test_{i}_inputimage.png')
         img_path_fake = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
                                 f'test_{i}_fakeimage.png')
+        img_path_final = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                 f'test_{i}_finalimage.png')
+
         tensor_to_pil_source = torchvision.transforms.ToPILImage()(source_image)
         tensor_to_pil_source.save(img_path_source)
-        tensor_to_pil_real = torchvision.transforms.ToPILImage()(real_image)
-        tensor_to_pil_real.save(img_path_real)
+        tensor_to_pil_source_cloth = torchvision.transforms.ToPILImage()(source_cloth_image)
+        tensor_to_pil_source_cloth.save(img_path_source_cloth)
+        tensor_to_pil_input = torchvision.transforms.ToPILImage()(input_cloth_image)
+        tensor_to_pil_input.save(img_path_input)
         tensor_to_pil_fake = torchvision.transforms.ToPILImage()(fake_image)
         tensor_to_pil_fake.save(img_path_fake)
-
-    # save the website
-    # webpage.save()
+        tensor_to_pil_final = torchvision.transforms.ToPILImage()(final_image)
+        tensor_to_pil_final.save(img_path_final)

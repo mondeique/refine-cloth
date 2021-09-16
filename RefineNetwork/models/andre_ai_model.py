@@ -107,7 +107,7 @@ class AndreAIModel(BaseModel):
         return self.criterionPerceptual(matched_features, fake_features), self.criterionPerceptual(input_features, fake_features)
 
     def forward(self):
-        a = torch.ones([1, 1, 512, 512]).to(self.device)
+        a = torch.ones([1, 1, 256, 256]).to(self.device)
         self.input_cloth_image_mask = torch.sub(a, self.input_cloth_image_mask).type(torch.uint8)
         self.source_cloth_image_mask = torch.sub(a, self.source_cloth_image_mask).type(torch.uint8)
 
@@ -116,7 +116,8 @@ class AndreAIModel(BaseModel):
         self.source_cloth_image = self.source_cloth_image.mul(self.source_cloth_image_mask)
         self.matched_mask = self.matched_mask.mul(self.source_cloth_image_mask)
         self.white_source_image = self.netWhite(torch.cat([self.source_image, self.source_image_mask], dim=1))
-        self.fake_image = self.netG_A(torch.cat([self.matched_mask, self.white_source_image], dim=1))
+        self.white_source_image = self.white_source_image.mul(self.source_image_mask)
+        self.fake_image = self.netG_A(torch.cat([self.input_cloth_image, self.white_source_image], dim=1))
 
         self.fake_image = self.fake_image.mul(self.source_image_mask)
 
@@ -133,9 +134,8 @@ class AndreAIModel(BaseModel):
         self.loss_L1 = self.criterionL1(self.input_cloth_image, self.fake_image)
 
         # combined loss
-        self.loss_G = self.loss_content_vgg_real + 3 * self.loss_content_vgg_white + 5 * self.loss_perceptual \
-                      + self.loss_perceptual_matched + \
-                      self.loss_L1 + self.loss_L1_matched
+        self.loss_G = 5 * self.loss_content_vgg_real + self.loss_content_vgg_white + 10 * self.loss_perceptual \
+                      + 10 * self.loss_perceptual_matched + 10 * self.loss_L1 + 10 * self.loss_L1_matched
         self.loss_G.backward()
 
     def optimize_parameters(self):
