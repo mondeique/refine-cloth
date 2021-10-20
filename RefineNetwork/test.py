@@ -28,7 +28,7 @@ if __name__ == '__main__':
     # dataset = data_loader.load_data()
     test_set = andre_ai_test_dataset.AndreAITestDataset(opt)
     ## dataset shuffle False 로 바꿔 test result 를 더 잘 보기 위함
-    dataset = DataLoader(test_set, batch_size=1, shuffle=False)
+    dataset = DataLoader(test_set, batch_size=1, shuffle=True)
     dataset_size = len(dataset)
     print('#test images = %d' % dataset_size)
     model = create_model(opt)
@@ -55,6 +55,8 @@ if __name__ == '__main__':
         input_cloth_image = model.input_cloth_image.cpu().squeeze_(0)
         fake_image = model.fake_image.cpu().squeeze_(0)
         final_image = model.final_image.cpu().squeeze_(0)
+        # white image
+        white_image = model.white_source_image.cpu().squeeze_(0)
         print(fake_image.shape)
         img_path_source = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
                                 f'test_{i}_sourceimage.png')
@@ -66,6 +68,8 @@ if __name__ == '__main__':
                                 f'test_{i}_fakeimage.png')
         img_path_final = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
                                  f'test_{i}_finalimage.png')
+        img_path_white = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                 f'test_{i}_whiteimage.png')
 
         tensor_to_pil_source = torchvision.transforms.ToPILImage()(source_image)
         tensor_to_pil_source.save(img_path_source)
@@ -77,3 +81,5 @@ if __name__ == '__main__':
         tensor_to_pil_fake.save(img_path_fake)
         tensor_to_pil_final = torchvision.transforms.ToPILImage()(final_image)
         tensor_to_pil_final.save(img_path_final)
+        tensor_to_pil_white = torchvision.transforms.ToPILImage()(white_image)
+        tensor_to_pil_white.save(img_path_white)

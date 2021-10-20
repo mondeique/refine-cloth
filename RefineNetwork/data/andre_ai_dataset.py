@@ -25,7 +25,10 @@ class AndreAIDataset(BaseDataset):
             product_path = os.path.join(self.dir_clothes, 'base', components[-3])
             for color in sorted(os.listdir(product_path)):
                 path_bundles.append({
-                    'matched_image': os.path.join(self.dir_clothes_hist, components[-3], components[-2] + '_' + color[0:4] + '.jpg'),
+                    'matched_real_image': os.path.join(self.dir_images_hist, components[-3],
+                                                  components[-2], components[-1].split('.')[0] + '_' + color[0:4] + '.jpg'),
+                    'matched_image': os.path.join(self.dir_clothes_hist, components[-3],
+                                                  components[-2] + '_' + color[0:4] + '.jpg'),
                     'input_cloth_image': os.path.join(self.dir_clothes, 'base', components[-3], color[0:4] + '.png'),
                     'input_cloth_image_mask': os.path.join(self.dir_clothes, 'mask', components[-3], color[0:4] + '_mask.png'),
                     'source_cloth_image': os.path.join(self.dir_clothes, 'base', components[-3], components[-2] + '.png'),
@@ -43,6 +46,7 @@ class AndreAIDataset(BaseDataset):
         self.dir_clothes = os.path.join(self.root, 'clothes')
         self.dir_images = os.path.join(self.root, 'images')
         self.dir_clothes_hist = os.path.join(self.root, 'clothes/hist/')
+        self.dir_images_hist = os.path.join(self.root, 'images/hist/')
         self.base_images_path = os.path.join(self.root, 'images/base')
         self.base_images_path = sorted(make_dataset(self.base_images_path))
 
