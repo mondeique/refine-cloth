@@ -33,15 +33,19 @@ def filter_upper_clothes(image):
     c[c == 1] = 255
     return c
 
-raw_data_path = '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/images/base'
+raw_data_path = '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/raw_data'
 for product in sorted(os.listdir(raw_data_path)):
     product_path = os.path.join(raw_data_path, product)
     for color in sorted(os.listdir(product_path)):
         color_path = os.path.join(product_path, color)
         for name in sorted(os.listdir(color_path)):
             images_path = os.path.join(color_path, name)
+            os.makedirs(f'./dataset/images/base/{product}/{color}', exist_ok=True)
+            print(images_path)
             os.system(
                 f"python /home/ubuntu/Desktop/human-parser/simple_extractor.py --dataset 'lip' --model-restore '/home/ubuntu/Desktop/human-parser/checkpoints/exp-schp-201908261155-lip.pth' --input-dir {images_path} --output-dir './dataset/images/segmentation/{product}/{color}'")
+            for poses in sorted(os.listdir(images_path)):
+                copyfile(os.path.join(images_path, poses), f'./dataset/images/base/{product}/{color}/{poses}')
             for poses in sorted(os.listdir(f'./dataset/images/segmentation/{product}/{color}')):
                 segmentation = Image.open(f'./dataset/images/segmentation/{product}/{color}/{poses}')
                 upper_clothes_mask = filter_upper_clothes(segmentation)

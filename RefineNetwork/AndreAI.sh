@@ -1,10 +1,11 @@
 # background remove source image
 cd ../image-background-remove-tool
-python main.py -i ../RefineNetwork/data/dataset/clothes/base/input_clothes.jpg -o ../RefineNetwork/data/dataset/clothes/base/
+python main.py -i /home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/c008.jpg -o /home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/c008.png
+
 
 # get mask of source image
 cd ../
-python get_mask.py -s './RefineNetwork/data/dataset/clothes/base/input_clothes.png' -r './RefineNetwork/data/dataset/clothes/mask/input_clothes_mask.png'
+python get_mask.py -s '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/c008.png' -r '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/mask/p001/c008_mask.png'
 
 # model image segmentation & mask
 cd RefineNetwork/data
