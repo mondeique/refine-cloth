@@ -26,7 +26,7 @@ class AndreAIDataset(BaseDataset):
             for color in sorted(os.listdir(product_path)):
                 path_bundles.append({
                     'matched_real_image': os.path.join(self.dir_images_hist, components[-3],
-                                                  components[-2], components[-1].split('.')[0] + '_' + color[0:4] + '.jpg'),
+                                                  components[-2], components[-1].split('.')[0] + '_' + color[0:4] + '.png'),
                     'matched_image': os.path.join(self.dir_clothes_hist, components[-3],
                                                   components[-2] + '_' + color[0:4] + '.jpg'),
                     'input_cloth_image': os.path.join(self.dir_clothes, 'base', components[-3], color[0:4] + '.png'),

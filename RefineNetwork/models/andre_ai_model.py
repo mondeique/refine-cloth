@@ -27,9 +27,9 @@ class AndreAIModel(BaseModel):
         BaseModel.initialize(self, opt)
 
         # specify the training losses you want to print out. The program will call base_model.get_current_losses
-        self.loss_names = ['content_vgg_real', 'content_vgg_white', 'perceptual', 'perceptual_matched', 'L1', 'L1_matched']
+        self.loss_names = ['content_vgg_real', 'content_vgg_white', 'perceptual_matched', 'L1_matched']
         # specify the images G_A'you want to save/display. The program will call base_model.get_current_visuals
-        visual_names_A = ['source_image', 'white_source_image', 'matched_mask', 'input_cloth_image', 'fake_image']
+        visual_names_A = ['source_image', 'white_source_image', 'hist_real_image', 'input_cloth_image', 'fake_image']
 
         self.visual_names = visual_names_A
         # specify the models you want to save to the disk. The program will call base_model.save_networks and base_model.load_networks
@@ -138,8 +138,7 @@ class AndreAIModel(BaseModel):
         self.loss_L1_matched = self.criterionL1(self.hist_real_image, self.fake_image)
 
         # combined loss
-        self.loss_G = 10 * self.loss_content_vgg_real + self.loss_content_vgg_white \
-                      + 10 * self.loss_perceptual_matched  + 10 * self.loss_L1_matched
+        self.loss_G = 10 * self.loss_content_vgg_real + self.loss_content_vgg_white + 10 * self.loss_perceptual_matched + 10 * self.loss_L1_matched
         self.loss_G.backward()
 
     def optimize_parameters(self):

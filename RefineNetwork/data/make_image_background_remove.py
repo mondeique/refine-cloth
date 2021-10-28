@@ -23,7 +23,7 @@ from PIL import Image
 # case 2 : real image remover
 
 raw_data_path = '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/images/'
-base_raw_data_path = os.path.join(raw_data_path, 'base_crop_2')
+base_raw_data_path = os.path.join(raw_data_path, 'hist_2')
 
 for product in sorted(os.listdir(base_raw_data_path)):
     product_path = os.path.join(base_raw_data_path, product)

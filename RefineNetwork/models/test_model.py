@@ -70,25 +70,25 @@ class TestModel(AndreAIModel):
     def set_input(self, input):
         self.source_image = input['source_image'].to(self.device)
         self.source_image_mask = input['source_image_mask'].to(self.device)
-        self.source_cloth_image = input['source_cloth_image'].to(self.device)
-        self.source_cloth_image_mask = input['source_cloth_image_mask'].to(self.device)
         self.input_cloth_image = input['input_cloth_image'].to(self.device)
         self.input_cloth_image_mask = input['input_cloth_image_mask'].to(self.device)
-        self.matched_mask = input['matched_image'].to(self.device)
+        self.hist_real_image = input['matched_real_image'].to(self.device)
 
     def forward(self):
         a = torch.ones([1, 1, 256, 256]).to(self.device)
         self.input_cloth_image_mask = torch.sub(a, self.input_cloth_image_mask).type(torch.uint8)
-        self.source_cloth_image_mask = torch.sub(a, self.source_cloth_image_mask).type(torch.uint8)
 
         self.original_image = self.source_image
         self.source_image = self.source_image.mul(self.source_image_mask)
         self.input_cloth_image = self.input_cloth_image.mul(self.input_cloth_image_mask)
-        self.source_cloth_image = self.source_cloth_image.mul(self.source_cloth_image_mask)
-        self.matched_mask = self.matched_mask.mul(self.source_cloth_image_mask)
         self.white_source_image = self.netWhite(torch.cat([self.source_image, self.source_image_mask], dim=1))
         self.white_source_image = self.white_source_image.mul(self.source_image_mask)
-        self.fake_image = self.netG_A(torch.cat([self.input_cloth_image, self.white_source_image], dim=1))
+
+        # white source image 에 input cloth color 입히고 content 만 따오도록 설정
+
+        self.hist_real_image = self.hist_real_image.mul(self.source_image_mask)
+
+        self.fake_image = self.netG_A(torch.cat([self.hist_real_image, self.white_source_image], dim=1))
 
         self.fake_image = self.fake_image.mul(self.source_image_mask)
 
