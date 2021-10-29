@@ -50,6 +50,7 @@ if __name__ == '__main__':
         # img_path = model.get_image_paths()
         # if i % 5 == 0:
         #     print('processing (%04d)-th image... %s' % (i, img_path))
+        original_image = model.original_image.cpu().squeeze_(0)
         source_image = model.source_image.cpu().squeeze_(0)
         input_cloth_image = model.input_cloth_image.cpu().squeeze_(0)
         fake_image = model.fake_image.cpu().squeeze_(0)
@@ -57,6 +58,8 @@ if __name__ == '__main__':
         # white image
         white_image = model.white_source_image.cpu().squeeze_(0)
         print(fake_image.shape)
+        img_path_original = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+                                       f'test_{i}_originalimage.png')
         img_path_source = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
                                 f'test_{i}_sourceimage.png')
         img_path_input = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
@@ -68,6 +71,8 @@ if __name__ == '__main__':
         img_path_white = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
                                  f'test_{i}_whiteimage.png')
 
+        tensor_to_pil_original = torchvision.transforms.ToPILImage()(original_image)
+        tensor_to_pil_original.save(img_path_original)
         tensor_to_pil_source = torchvision.transforms.ToPILImage()(source_image)
         tensor_to_pil_source.save(img_path_source)
         tensor_to_pil_input = torchvision.transforms.ToPILImage()(input_cloth_image)

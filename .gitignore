@@ -11,6 +11,8 @@ RefineNetwork/checkpoints/
 RefineNetwork/results/
 RefineNetwork/last_exp/
 RefineNetwork/data/raw_data/
+RefineNetwork/data/raw_data_copy/
+RefineNetwork/data/dataset_origin/
 
 .idea
 .DS_Store
