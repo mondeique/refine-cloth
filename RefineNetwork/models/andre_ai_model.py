@@ -138,7 +138,7 @@ class AndreAIModel(BaseModel):
         self.loss_L1_matched = self.criterionL1(self.hist_real_image, self.fake_image)
 
         # combined loss
-        self.loss_G = 10 * self.loss_content_vgg_real + self.loss_content_vgg_white + 10 * self.loss_perceptual_matched + 10 * self.loss_L1_matched
+        self.loss_G = 10 * self.loss_content_vgg_real + 5 * self.loss_content_vgg_white + 8 * self.loss_perceptual_matched + 30 * self.loss_L1_matched
         self.loss_G.backward()
 
     def optimize_parameters(self):

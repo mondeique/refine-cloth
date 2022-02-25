@@ -59,7 +59,7 @@ class AndreAIWhiteModel(BaseModel):
     def set_input(self, input):
         self.source_image = input['source_image'].to(self.device)
         self.source_image_mask = input['source_image_mask'].to(self.device)
-        self.source_image_mask_multi = self.source_image_mask.expand(2,3,512,512)
+        self.source_image_mask_multi = self.source_image_mask.expand(2,3,256,256)
 
     def get_vgg_loss(self):
         source_features = self.VGG19(self.source_image)
@@ -88,7 +88,7 @@ class AndreAIWhiteModel(BaseModel):
         self.loss_L1 = self.criterionL1(self.source_image_mask_multi, self.white_source_image)
 
         # combined loss
-        self.loss_G = 10 * self.loss_content_vgg + self.loss_perceptual + 20 * self.loss_L1
+        self.loss_G = 5 * self.loss_content_vgg + 5 * self.loss_perceptual + 100 * self.loss_L1
         self.loss_G.backward()
 
     def optimize_parameters(self):
