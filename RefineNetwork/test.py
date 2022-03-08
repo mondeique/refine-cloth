@@ -58,28 +58,28 @@ if __name__ == '__main__':
         # white image
         white_image = model.white_source_image.cpu().squeeze_(0)
         print(fake_image.shape)
-        img_path_original = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
-                                       f'test_{i}_originalimage.png')
-        img_path_source = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
-                                f'test_{i}_sourceimage.png')
-        img_path_input = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
-                                f'test_{i}_inputimage.png')
-        img_path_fake = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
-                                f'test_{i}_fakeimage.png')
+        # img_path_original = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+        #                                f'test_{i}_originalimage.png')
+        # img_path_source = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+        #                         f'test_{i}_sourceimage.png')
+        # img_path_input = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+        #                         f'test_{i}_inputimage.png')
+        # img_path_fake = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+        #                         f'test_{i}_fakeimage.png')
         img_path_final = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
                                  f'test_{i}_finalimage.png')
-        img_path_white = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
-                                 f'test_{i}_whiteimage.png')
+        # img_path_white = os.path.join('/home/ubuntu/Desktop/data-conversion/RefineNetwork/results/test_latest/images',
+        #                          f'test_{i}_whiteimage.png')
 
-        tensor_to_pil_original = torchvision.transforms.ToPILImage()(original_image)
-        tensor_to_pil_original.save(img_path_original)
-        tensor_to_pil_source = torchvision.transforms.ToPILImage()(source_image)
-        tensor_to_pil_source.save(img_path_source)
-        tensor_to_pil_input = torchvision.transforms.ToPILImage()(input_cloth_image)
-        tensor_to_pil_input.save(img_path_input)
-        tensor_to_pil_fake = torchvision.transforms.ToPILImage()(fake_image)
-        tensor_to_pil_fake.save(img_path_fake)
+        # tensor_to_pil_original = torchvision.transforms.ToPILImage()(original_image)
+        # tensor_to_pil_original.save(img_path_original)
+        # tensor_to_pil_source = torchvision.transforms.ToPILImage()(source_image)
+        # tensor_to_pil_source.save(img_path_source)
+        # tensor_to_pil_input = torchvision.transforms.ToPILImage()(input_cloth_image)
+        # tensor_to_pil_input.save(img_path_input)
+        # tensor_to_pil_fake = torchvision.transforms.ToPILImage()(fake_image)
+        # tensor_to_pil_fake.save(img_path_fake)
         tensor_to_pil_final = torchvision.transforms.ToPILImage()(final_image)
         tensor_to_pil_final.save(img_path_final)
-        tensor_to_pil_white = torchvision.transforms.ToPILImage()(white_image)
-        tensor_to_pil_white.save(img_path_white)
+        # tensor_to_pil_white = torchvision.transforms.ToPILImage()(white_image)
+        # tensor_to_pil_white.save(img_path_white)

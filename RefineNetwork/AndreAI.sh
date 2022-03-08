@@ -1,16 +1,28 @@
+#!/bin/bash
+
 # activate virtualenv
 source activate img2img-translation
 
+#
+python clothes_util.py
 # background remove source image
-cd ../image-background-remove-tool
-python main.py -i /home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/c001.jpg -o /home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/c001.png
+#cd ../image-background-remove-tool
+#LOCATION=/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/
+#FILE=$(find $LOCATION -type f)
+#for i in $FILE;
+#do
+#  NEW_LOCATION=${i}.png
+#  python main.py -i ${i} -o ${NEW_LOCATION}
+#done
+#  NEW_LOCATION=${i}+".png"
+#  python main.py -i ${i} -o ${NEW_LOCATION}
 
-# get mask of source image
-cd ../
-python get_mask.py -s '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/c001.png' -r '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/mask/p001/c001_mask.png'
+## get mask of source image
+#cd ../
+#python get_mask.py -s '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/base/p001/c001.png' -r '/home/ubuntu/Desktop/data-conversion/RefineNetwork/data/dataset/clothes/mask/p001/c001_mask.png'
 
 # model image segmentation & mask
-cd RefineNetwork/data
+cd /home/ubuntu/Desktop/data-conversion/RefineNetwork/data
 python render_data_AndreAI.py
 
 # model image 상의부분만 추출한 base crop
